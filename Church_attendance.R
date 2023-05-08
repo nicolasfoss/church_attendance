@@ -2,7 +2,7 @@
 ### Forecasting church attendance monthly, weekly.
 ###____________________________________________________________
 
-setwd("C:/Users/13193/Desktop/R/Church Attendance/")
+setwd("C:/Users/ndfos/Desktop/")
 
 install.packages(c("tidyverse", "WVPlots", "vtreat"))
 library(tidyverse)
@@ -27,7 +27,7 @@ Church_attendance <- read_csv(
          day = day(date), 
          week = week(date),
          .after = date
-         ) %>% 
+  ) %>% 
   mutate(cumavg = cummean(attendance),
          .after = attendance
   )
@@ -39,21 +39,19 @@ Church_attendance_filter <- Church_attendance %>%
 # Draw graphs of attendance data distribution
 #____________________________________________________________
 
-distribution_2019_2023 <- 
-  ggplot(Church_attendance, aes(x = attendance)) + 
+ggplot(Church_attendance, aes(x = attendance)) + 
   geom_histogram(bins = 26) + 
   labs(title = "Distribution of Church Attendance 2019-2023",
        y = "Count",
        caption = "Dr. Nicolas Foss, MS") + 
   theme(plot.caption = element_text(hjust = 0)) + 
-  theme_fivethirtyeight()
+  theme_gdocs()
 
-ggsave("distribution_2019_2023.png", plot = distribution_2019_2023, width = 6.5, height = 5, units = "in")
+ggsave("distribution_2019_2023.png", width = 6.5, height = 5, units = "in")
 
 # density plot.
 
-density_2019_2023 <-
-  ggplot(Church_attendance, 
+ggplot(Church_attendance, 
          aes(
            x = attendance
          )) + 
@@ -63,14 +61,13 @@ density_2019_2023 <-
        y = "Count",
        caption = "Dr. Nicolas Foss, MS") + 
   theme(plot.caption = element_text(hjust = 0)) + 
-  theme_fivethirtyeight()
+  theme_gdocs()
 
-ggsave("density_2019_2023.png", plot = density_2019_2023, width = 7.25, height = 5, units = "in")
+ggsave("density_2019_2023.png", width = 7.25, height = 5, units = "in")
 
 # boxplot.
 
-boxplot_2019_2023 <- 
-  ggplot(Church_attendance, 
+ggplot(Church_attendance, 
          aes(
            x = year, y = attendance
          )) +
@@ -81,20 +78,20 @@ boxplot_2019_2023 <-
        y = "Count",
        caption = "Dr. Nicolas Foss, MS") + 
   theme(plot.caption = element_text(hjust = 0)) + 
-  theme_fivethirtyeight()
+  theme_gdocs()
 
-ggsave("boxplot_2019_2023.png", plot = boxplot_2019_2023, width = 8, height = 5, units = "in")
+ggsave("boxplot_2019_2023.png", width = 8, height = 5, units = "in")
 
 # plot the cumulative average 2019 - 2023
 
-cumavg_2019_2023 <- Church_attendance %>% 
+Church_attendance %>% 
   ggplot(aes(
     x = date,
     y = cumavg
   )
   ) +
   geom_line(color = "darkorange",
-            linewidth = 2.5,
+            linewidth = 1.25,
             arrow = arrow(length = unit(1, "cm"))
   ) + 
   labs(title = "Cumulative Average Attendance",
@@ -103,46 +100,44 @@ cumavg_2019_2023 <- Church_attendance %>%
        y = "Cumulative Average Attendance",
        caption = "Dr. Nicolas Foss, MS"
   ) + 
-  theme_fivethirtyeight()
+  theme_gdocs()
 
-ggsave("cumavg_2019_2023.png", plot = cumavg_2019_2023, width = 8, height = 5, units = "in")
+ggsave("cumavg_2019_2023.png", width = 8, height = 5, units = "in")
 
 # plot the cumulative average 2022 - 2023
 
-cumavg_2022_2023 <- 
-  Church_attendance %>% 
+Church_attendance %>% 
   filter(year %in% c("2022", "2023")) %>% 
   ggplot(aes(
-           x = date,
-           y = cumavg
-           )
-         ) +
+    x = date,
+    y = cumavg
+  )
+  ) +
   geom_line(color = "steelblue",
             linewidth = 2,
             arrow = arrow(length = unit(.5, "cm"))
-            ) + 
+  ) + 
   labs(title = "Cumulative Average Attendance",
        subtitle = "Years 2019 - 2023",
        x = "Date",
        y = "Cumulative Average Attendance",
        caption = "Dr. Nicolas Foss, MS"
-       ) + 
-  theme_fivethirtyeight()
+  ) + 
+  theme_gdocs()
 
-ggsave("cumavg_2022_2023.png", plot = cumavg_2022_2023, width = 10, height = 6, units = "in")
+ggsave("cumavg_2022_2023.png", width = 10, height = 6, units = "in")
 
 
 #____________________________________________________________
 # Plot scatterplot of attendance data for all years and months.
 #____________________________________________________________
 
-scatterplot_1 <-
-  ggplot(Church_attendance, 
+ggplot(Church_attendance, 
          aes(
            x = date,
            y = attendance
-           )
-         ) +
+         )
+  ) +
   geom_point(alpha = 0.5,
              color = "orange",
              size = 2,
@@ -158,9 +153,9 @@ scatterplot_1 <-
        y = "Count",
        caption = "Dr. Nicolas Foss, MS") + 
   theme(plot.caption = element_text(hjust = 0)) + 
-  theme_fivethirtyeight()
+  theme_gdocs()
 
-ggsave("scatterplot_1.png", plot = scatterplot_1, width = 6.5, height = 5, units = "in")
+ggsave("scatterplot_1.png", width = 6.5, height = 5, units = "in")
 
 #_______________________________________________________________________________
 # Fit regression models to the data.
@@ -173,11 +168,11 @@ set.seed(123) # for reproducibility
 # set up the training and test data
 
 Church_attendance_train <- Church_attendance_filter %>% 
-  filter(date >= "2021-01-01" & date < "2023-01-01")
+  filter(date >= "2022-01-01" & date < "2023-01-01")
 
 Church_attendance_test <- Church_attendance_filter %>% 
   filter(date > max(Church_attendance_train$date))
-  
+
 # set up the first model, it is not great.
 
 model_lm <- lm(attendance ~ date, data = Church_attendance_train) # model does not perform well with just the date
@@ -225,47 +220,77 @@ rmse <- function(pred.outcome, true.outcome) {
 
 # test the model - calculate pseudo R squared
 
-glance(model_glm_add) %>% summarize(pseudoR2 = 1 - deviance/null.deviance) # pretty good
-glance(model_lm_add) # performs alright!
+glance(model_glm_add) %>% summarize(pseudoR2 = 1 - deviance/null.deviance) # pretty good, pseudoR2 = .947
+glance(model_lm_add) # performs alright! r.squared = .998
 
 # continue with the linear regression model
 # visualize the model
 
-Church_attendance_predictions_sep <- Church_attendance_test %>% 
+Church_attendance_predictions_lm_sep <- Church_attendance_test %>% 
   mutate(predicted = predict(model_lm_add, newdata = Church_attendance_test)
   )
 
-# check RMSE vs SD
+# make predictions using the quasipoisson model
 
-with(Church_attendance_predictions_sep, rmse(predicted, attendance)) # 40.77807
+Church_attendance_predictions_glm_sep <- Church_attendance_test %>% 
+  mutate(predicted = predict(model_glm_add, newdata = Church_attendance_test, type = "response")
+  )
+
+# check RMSE vs SD for linear model
+
+with(Church_attendance_predictions_lm_sep, rmse(predicted, attendance)) # 39.7577
 with(Church_attendance, sd(attendance)) # 59.16956
 
-# RMSE is quite a bit lower than the SD, so it seems based on r^2 and  
+# check RMSE vs SD for quasipoisson model
 
-Church_attendance_predictions <- Church_attendance_test %>% 
+with(Church_attendance_predictions_glm_sep, rmse(predicted, attendance)) # 34.38914, better!
+with(Church_attendance, sd(attendance)) # 59.16956
+
+# RMSE is quite a bit lower than the SD, so it seems based on r^2 and RMSE vs SD that he quasipoisson could
+# help us reduce the errors. The errors are still large given with the lm at 39 people and 
+# the quasipoisson at 34.  These are large errors given the raw outcome mean of 148.1558.
+# let's give this a shot and see how we do.
+
+# linear table
+
+Church_attendance_predictions_lm <- Church_attendance_test %>% 
   mutate(predicted = predict(model_lm_add, newdata = Church_attendance_test)
-         ) %>%
+  ) %>%
   pivot_longer(cols = c(attendance, predicted),
                names_to = "type",
                values_to = "value"
   )
 
+# quasipoisson table
+
+Church_attendance_predictions_glm <- Church_attendance_test %>% 
+  mutate(predicted = predict(model_glm_add, newdata = Church_attendance_test, type = "response")
+  ) %>%
+  pivot_longer(cols = c(attendance, predicted),
+               names_to = "type",
+               values_to = "value"
+  )
+
+###_____________________________________________________________________________
+### Linear plots and analysis
+###_____________________________________________________________________________
+
 # Let's take a look at the values together with the predictions.
 
-ggplot(Church_attendance_predictions_sep, aes(x = predicted, y = attendance)) +
+ggplot(Church_attendance_predictions_lm_sep, aes(x = predicted, y = attendance)) +
   geom_point(alpha = 0.3,
              size = 2,
              color = "red",
              shape = 2
-             ) + 
-  geom_abline() # overall the model seems to underestimate church attendance
+  ) + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") # overall the model seems to underestimate church attendance
 
-ggplot(Church_attendance_predictions, aes(date, value, color = type)) +
+ggplot(Church_attendance_predictions_lm, aes(date, value, color = type)) +
   geom_point() # further confirmation
 
 # check model performance
 
-GainCurvePlot(Church_attendance_predictions_sep, "predicted", "attendance", "Church Attendance Model")
+GainCurvePlot(Church_attendance_predictions_lm_sep, "predicted", "attendance", "Church Attendance Model - Linear Regression") # good performance
 
 autoplot(model_lm_add, which = 1:4) # errors in this model seem to be a problem
 
@@ -273,39 +298,146 @@ autoplot(model_lm_add, which = 1:4) # errors in this model seem to be a problem
 # Moving forward with the linear model - total attendance predicted by time
 #_______________________________________________________________________________
 
-Church_attendance_predictions_sep %>% 
+Church_attendance_predictions_lm_sep %>% 
   ggplot(aes(x = date,
-           y = predicted
-           )
-       ) + 
+             y = predicted
+  )
+  ) + 
   geom_point(alpha = 0.5,
              size = 2,
              color = "orange"
-             ) +
+  ) +
   geom_point(aes(y = attendance),
              color = "darkblue",
              alpha = 0.5
-             ) +
+  ) +
   geom_smooth(method = "lm",
               se = FALSE,
               color = "darkorange",
               linewidth = 1.5,
               alpha = 0.1
+  ) +
+  geom_smooth(aes(y = attendance),
+              method = "lm",
+              se = FALSE,
+              color = "darkblue",
+              linewidth = 1.5,
+              alpha = 0.1 
+  ) +
+  geom_line(aes(y = cumavg),
+            linetype = "dashed",
+            linewidth = 2,
+            alpha = 0.3,
+            color = "darkgreen"
+  ) +
+  geom_text(aes(x = as.Date("2023-03-15"), y = 160, label = "truth"),
+            color = "darkblue",
+            size = 4,
+            fontface = "bold"
+  ) +
+  geom_text(aes(x = as.Date("2023-03-16"), y = 121, label = "forecast"),
+            color = "darkorange",
+            size = 4,
+            fontface = "bold"
+  ) + 
+  geom_text(aes(x = as.Date("2023-04-20"), y = 145, label = "true average"),
+            color = "darkgreen",
+            size = 4,
+            fontface = "bold"
+  ) +
+  labs(title = "Fitting A Linear Regression Model to the Attendance Data",
+       subtitle = "Jan 2023 - April 2023",
+       x = "Time",
+       y = "Attendance",
+       caption = "Dr. Nicolas Foss, MS"
+  ) +
+  theme(plot.caption = element_text(hjust = 0)) + 
+  theme_gdocs()
+
+ggsave("Church_fit_lm.png", width = 8, height = 6, units = "in")
+
+###_____________________________________________________________________________
+### Quasipoisson plots and analysis
+###_____________________________________________________________________________
+
+# Let's take a look at the values together with the predictions.
+
+ggplot(Church_attendance_predictions_glm_sep, aes(x = predicted, y = attendance)) +
+  geom_point(alpha = 0.3,
+             size = 2,
+             color = "red",
+             shape = 2
+  ) + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") # overall the model seems to underestimate church attendance
+
+ggplot(Church_attendance_predictions_glm, aes(date, value, color = type)) +
+  geom_point() # further confirmation
+
+# check model performance
+
+GainCurvePlot(Church_attendance_predictions_glm_sep, "predicted", "attendance", "Church Attendance Model - Quasipoisson") # strong performance here, too
+
+autoplot(model_glm_add, which = 1:4) # errors in this model seem to be a problem
+
+#_______________________________________________________________________________
+# Moving forward with the quasipoisson model - total attendance predicted by time
+#_______________________________________________________________________________
+
+Church_attendance_predictions_glm_sep %>% 
+  ggplot(aes(x = date,
+             y = predicted
+  )
+  ) + 
+  geom_point(alpha = 0.5,
+             size = 2,
+             color = "orange"
+  ) +
+  geom_point(aes(y = attendance),
+             color = "darkblue",
+             alpha = 0.5
+  ) +
+  geom_smooth(method = "lm",
+              se = FALSE,
+              color = "darkorange",
+              linewidth = 1.5,
+              alpha = 0.1
+  ) +
+  geom_smooth(aes(y = attendance),
+              method = "lm",
+              se = FALSE,
+              color = "darkblue",
+              linewidth = 1.5,
+              alpha = 0.1 
               ) +
   geom_line(aes(y = cumavg),
             linetype = "dashed",
             linewidth = 2,
             alpha = 0.3,
             color = "darkgreen"
-            ) +
-  labs(title = "Fitting A Linear Regression Model to the Attendance Data",
+  ) +
+  geom_text(aes(x = as.Date("2023-03-15"), y = 160, label = "truth"),
+            color = "darkblue",
+            size = 4,
+            fontface = "bold"
+  ) +
+  geom_text(aes(x = as.Date("2023-03-15"), y = 126, label = "forecast"),
+            color = "darkorange",
+            size = 4,
+            fontface = "bold"
+  ) + 
+  geom_text(aes(x = as.Date("2023-04-20"), y = 145, label = "true average"),
+            color = "darkgreen",
+            size = 4,
+            fontface = "bold"
+  ) +
+  labs(title = "Fitting A Quasipoisson Regression Model to the Attendance Data",
        subtitle = "Jan 2023 - April 2023",
        x = "Time",
        y = "Attendance",
        caption = "Dr. Nicolas Foss, MS"
-       ) +
+  ) +
   theme(plot.caption = element_text(hjust = 0)) + 
-  theme_fivethirtyeight()
+  theme_gdocs()
 
 ggsave("Church_fit.png", width = 8, height = 6, units = "in")
 
@@ -314,60 +446,61 @@ ggsave("Church_fit.png", width = 8, height = 6, units = "in")
 ### Machine learning
 ###_____________________________________________________________________________
 
-Church_attendance_kway <- Church_attendance_filter %>% 
-  add_column(pred_cv = 0)
+#____________________________________
+# cross validation using lm
+#____________________________________
 
-splitPlan <- kWayCrossValidation(nrow(Church_attendance_kway), 3, NULL, NULL) # create a split plan
+Church_attendance_kway_lm <- Church_attendance_filter %>% 
+  add_column(pred_cv = 0) %>% 
+  filter(date >= "2022-01-01")
+
+splitPlan <- kWayCrossValidation(nrow(Church_attendance_kway_lm), 3, NULL, NULL) # create a split plan
 
 k <- 3 # number of splits
 
 for(i in 1:k) {
   split <- splitPlan[[i]]
-  model <- lm(attendance ~ year + month + online + congregation, data = Church_attendance_kway[split$train, ])
-  Church_attendance_kway$pred_cv[split$app] <- predict(model, newdata = Church_attendance_kway[split$app, ])
+  model1 <- lm(attendance ~ date + online + congregation, data = Church_attendance_kway_lm[split$train, ])
+  Church_attendance_kway_lm$pred_cv[split$app] <- predict(model1, newdata = Church_attendance_kway_lm[split$app, ])
 }
 
 # Look at coefficients
 
-rmse(Church_attendance_kway$pred_cv, Church_attendance_kway$attendance) # 4.696379
+rmse(Church_attendance_kway_lm$pred_cv, Church_attendance_kway_lm$attendance) # 11.91923
 sd(Church_attendance$attendance) # 59.16956
-autoplot(model, which = 1:4) # errors are still a problem here
-GainCurvePlot(Church_attendance_kway, "pred_cv", "attendance", "Church Attendance Model") # performs alright
-glance(model) # good r^2 value - 0.977
+autoplot(model1, which = 1:4) # errors are still a problem here
+GainCurvePlot(Church_attendance_kway_lm, "pred_cv", "attendance", "Church Attendance Model") # performs alright, not as good as previous
+glance(model1) # good r^2 value - 0.863 - not as strong as previous
 
-# seems to perform better than previous models.
+# seems to perform less well than previous models.  Less complexity is better?
 
-Church_attendance_kway %>%
-  ggplot(aes(x = date, y = pred_cv)) + 
+Church_attendance_kway_lm %>%
+  ggplot(aes(x = pred_cv, y = attendance)) + 
   geom_point(color = "blue",
              alpha = 0.2
-             ) + 
-  geom_smooth(method = "lm",
-              se = FALSE
+  ) + 
+  geom_abline(color = "steelblue",
+              alpha = .3,
+              linetype = "dashed",
+              linewidth = 1.5
               ) +
-  geom_point(aes(y = attendance),
-             color = "darkred",
-             size = 1.5,
-             alpha = 0.2,
-             shape = 2
-             ) +
-  theme_fivethirtyeight()
+  theme_gdocs() # still several areas of overestimation and underestimation.
 
 # check distribution of the attendance and predicted values.
 
-Church_attendance_kway %>% 
+Church_attendance_kway_lm %>% 
   pivot_longer(cols = c(pred_cv, attendance),
                names_to = "type",
                values_to = "value"
-               ) %>% 
+  ) %>% 
   ggplot(aes(year, value)) +
   geom_boxplot() +
-  facet_wrap(~type) # quite similar!
+  facet_wrap(~type) # notice how the median 2023 predicted attendance is significantly lower
 
 # model still seems to underestimate and overestimate attendance at times.
-# predictions start to fail in 2023.
+# predictions start to fail significantly in 2023.
 
-Church_attendance_kway %>% 
+Church_attendance_kway_lm %>% 
   ggplot(aes(x = pred_cv, y = attendance)) + 
   geom_point(color = "blue",
              alpha = 0.2
@@ -375,8 +508,73 @@ Church_attendance_kway %>%
   geom_abline(color = "red",
               linewidth = 1.5,
               alpha = 0.3
-              ) + 
+  ) + 
   theme_clean()
+
+#____________________________________
+# cross validation using quasipoisson
+#____________________________________
+
+Church_attendance_kway_glm <- Church_attendance_filter %>% 
+  add_column(pred_cv = 0) %>% 
+  filter(date >= "2022-01-01")
+
+splitPlan_glm <- kWayCrossValidation(nrow(Church_attendance_kway_glm), 3, NULL, NULL) # create a split plan
+
+k <- 3 # number of splits
+
+for(i in 1:k) {
+  split_glm <- splitPlan_glm[[i]]
+  model2 <- glm(attendance ~ date + online + congregation, data = Church_attendance_kway_glm[split_glm$train, ], family = "quasipoisson")
+  Church_attendance_kway_glm$pred_cv[split_glm$app] <- predict(model2, newdata = Church_attendance_kway_glm[split_glm$app, ], type = "response")
+}
+
+# Look at coefficients
+
+rmse(Church_attendance_kway_glm$pred_cv, Church_attendance_kway_glm$attendance) # 13.80215
+sd(Church_attendance$attendance) # 59.16956
+autoplot(model2, which = 1:4) # errors are still a problem here
+GainCurvePlot(Church_attendance_kway_glm, "pred_cv", "attendance", "Church Attendance Model") # performs alright
+glance(model2) %>% summarize(pseudoR2 = 1 - deviance/null.deviance) # good pseudo r^2 value - 0.824
+
+# seems to perform better than previous models.
+
+Church_attendance_kway_glm %>%
+  ggplot(aes(x = pred_cv, y = attendance)) + 
+  geom_point(color = "blue",
+             alpha = 0.2
+  ) + 
+  geom_abline(color = "steelblue",
+              alpha = .3,
+              linetype = "dashed",
+              linewidth = 1.5
+  ) +
+  theme_gdocs() # still several areas of overestimation and underestimation, slightly better than lm.
+
+# check distribution of the attendance and predicted values.
+
+Church_attendance_kway_glm %>% 
+  pivot_longer(cols = c(pred_cv, attendance),
+               names_to = "type",
+               values_to = "value"
+  ) %>% 
+  ggplot(aes(year, value)) +
+  geom_boxplot() +
+  facet_wrap(~type) # performance in 2022 is ok, 2023 is still underestimated
+
+# model still seems to underestimate and overestimate attendance at times.
+# predictions still fail in 2023.
+
+Church_attendance_kway_glm %>% 
+  ggplot(aes(x = pred_cv, y = attendance)) + 
+  geom_point(color = "blue",
+             alpha = 0.2
+  ) + 
+  geom_abline(color = "red",
+              linewidth = 1.5,
+              alpha = 0.3
+  ) + 
+  theme_gdocs()
 
 ###_____________________________________________________________________________
 ### Try a random forest model to improve.
@@ -385,7 +583,7 @@ Church_attendance_kway %>%
 ranger_mod <- ranger(attendance ~ date + online + congregation, Church_attendance_train, 
                      num.trees = 500,
                      respect.unordered.factors = "order"
-                     )
+)
 
 ranger_mod # r^2 value far below the other models 0.6306981 
 
@@ -409,7 +607,7 @@ GainCurvePlot(Church_attendance_ranger, "predicted", "attendance", "Random Fores
 
 # Check RMSE vs SD
 
-with(Church_attendance_ranger, rmse(predicted, attendance)) # 43.25847
+with(Church_attendance_ranger, rmse(predicted, attendance)) # 44.63824
 with(Church_attendance, sd(attendance)) # 59.16956
 
 ###_____________________________________________________________________________
@@ -419,4 +617,3 @@ with(Church_attendance, sd(attendance)) # 59.16956
 ### However, it is possible from this dataset given its raw outcome variable's
 ### distribution and nature to estimate future attendance with the data given.
 ###_____________________________________________________________________________
-
